@@ -14,8 +14,12 @@ export interface VoyageEmbeddingsParams extends EmbeddingsParams {
    * limited by the Voyage AI API to a maximum of 8.
    */
   batchSize?: number;
-}
 
+  /**
+   * Input type for the embeddings request.
+   */
+  inputType?: string;
+}
 /**
  * Interface for the request body to generate embeddings.
  */
@@ -78,6 +82,7 @@ export class VoyageEmbeddings
     this.batchSize = fieldsWithDefaults?.batchSize ?? this.batchSize;
     this.apiKey = apiKey;
     this.apiUrl = `${this.basePath}/embeddings`;
+    this.inputType = fieldsWithDefaults?.inputType ?? "default_input_type"; // Define a default input type if necessary
   }
 
   /**
@@ -91,6 +96,7 @@ export class VoyageEmbeddings
     const batchRequests = batches.map((batch) =>
       this.embeddingWithRetry({
         model: this.modelName,
+        input_type: this.inputType, // Add input_type to the request
         input: batch,
       })
     );
@@ -119,6 +125,7 @@ export class VoyageEmbeddings
     const { data } = await this.embeddingWithRetry({
       model: this.modelName,
       input: text,
+      input_type: this.inputType, // Add input_type to the request
     });
 
     return data[0].embedding;
